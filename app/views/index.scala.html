@@ -1,0 +1,12 @@
+@()
+
+@main("Welcome to Play") {
+    <h1>Welcome to Play!</h1>
+    <ul id="chat-log">
+    </ul>
+    <form id="chat-submit">
+        <input type="text" id="chat-box" />
+        <button type="submit" id="send-button">Send</button>
+    </form>
+    <script src="@routes.Assets.versioned("javascripts/chat.js")" type="text/javascript"></script>
+}
