@@ -34,13 +34,16 @@ class HomeController @Inject()(cc: ControllerComponents)(
 
   val roomActor = actorSystem.spawn(actors.ChatRoom.chatRoom(Map.empty), "room")
 
-  implicit val clientCommandReads: OFormat[actors.ClientCommand] =
+  implicit val clientCommandFormat: OFormat[actors.ClientCommand] =
     derived.oformat()
 
-  implicit val flowTransformer: MessageFlowTransformer[actors.ClientCommand, String] =
-    MessageFlowTransformer.jsonMessageFlowTransformer[actors.ClientCommand, String]
+  implicit val clientOutputFormat: OFormat[actors.ClientOutput] =
+    derived.flat.oformat((__ \ "type").format[String])
 
-  def chat() = WebSocket.accept[actors.ClientCommand, String] { request =>
+  implicit val flowTransformer: MessageFlowTransformer[actors.ClientCommand, actors.ClientOutput] =
+    MessageFlowTransformer.jsonMessageFlowTransformer[actors.ClientCommand, actors.ClientOutput]
+
+  def chat() = WebSocket.accept[actors.ClientCommand, actors.ClientOutput] { request =>
     ActorFlow.actorRef { out =>
       PropsAdapter(actors.ChatRoom.unconnectedClient(roomActor, out))
     }

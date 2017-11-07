@@ -4,7 +4,7 @@ import akka.typed._
 import akka.typed.scaladsl.Actor
 
 object ChatRoom {
-  def unconnectedClient(connector: ActorRef[JoinRoom], out: ActorRef[String]): Behavior[Command] =
+  def unconnectedClient(connector: ActorRef[JoinRoom], out: ActorRef[ClientOutput]): Behavior[Command] =
     Actor.deferred { ctx =>
       val outHandler = ctx.spawnAnonymous(outputHandler(ctx.self, out))
       Actor.immutable[Command] { (_, msg) =>
@@ -31,12 +31,12 @@ object ChatRoom {
       }
     }
 
-  def outputHandler(inputHandler: ActorRef[InputHandlerCommand], output: ActorRef[String]): Behavior[ChatEvent] =
+  def outputHandler(inputHandler: ActorRef[InputHandlerCommand], output: ActorRef[ClientOutput]): Behavior[ChatEvent] =
     Actor.immutable[ChatEvent] { (_, msg) =>
       msg match {
-        case DisplayMessage(msg) => output ! msg
+        case DisplayMessage(msg) => output ! Message(msg)
         case Connected(room) =>
-          output ! "Connected to room"
+          output ! Message("Connected to room")
           inputHandler ! SwitchToConnected(room)
         case _ =>
       }
@@ -78,6 +78,9 @@ object ChatRoom {
     Actor.same
   }
 }
+
+sealed trait ClientOutput
+final case class Message(message: String) extends ClientOutput
 
 sealed trait ChatEvent
 final case class Connected(room: ActorRef[RoomCommand]) extends ChatEvent

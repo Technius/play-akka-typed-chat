@@ -16,9 +16,11 @@ document.getElementById("chat-submit").addEventListener("submit", function(e) {
         if (ws == null) {
             ws = new WebSocket("ws://" + location.host + "/chat");
             ws.onmessage = function(e) {
-                console.log(e.data);
+                var data = JSON.parse(e.data);
+                var msg = data.message;
+                console.log("Received message from server:", data);
                 var child = document.createElement("li");
-                child.textContent = e.data;
+                child.textContent = msg;
                 chatlog.appendChild(child);
             };
             ws.onclose = function() {
