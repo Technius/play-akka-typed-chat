@@ -1,12 +1,18 @@
 @()
 
-@main("Welcome to Play") {
-    <h1>Welcome to Play!</h1>
-    <ul id="chat-log">
-    </ul>
-    <form id="chat-submit">
-        <input type="text" id="chat-box" />
-        <button type="submit" id="send-button">Send</button>
-    </form>
-    <script src="@routes.Assets.versioned("javascripts/chat.js")" type="text/javascript"></script>
+@main("Chat webapp with Akka Typed and Play") {
+    <div class="pure-g">
+        <div class="pure-u-1-5"></div>
+        <div id="main-app" class="pure-u-3-5">
+            <p>Send a username to "log in," and then you'll be able to chat!</p>
+            <ul id="chat-log">
+            </ul>
+            <form id="chat-submit" class="pure-form">
+                <input type="text" id="chat-box" />
+                <button type="submit" id="send-button" class="pure-button pure-button-primary">Send</button>
+            </form>
+        </div>
+        <div class="pure-u-1-5"></div>
+        <script src="@routes.Assets.versioned("javascripts/chat.js")" type="text/javascript"></script>
+    </div>
 }

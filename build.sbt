@@ -23,7 +23,8 @@ libraryDependencies ++= Seq(
   guice,
   "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % Test,
   akkaTyped.value,
-  playJsonDerivedCodecs.value
+  playJsonDerivedCodecs.value,
+  webjarPurecss.value
 )
 
 // Adds additional packages into Twirl

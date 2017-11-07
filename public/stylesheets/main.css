@@ -1,3 +1,20 @@
-.hidden {
-    display: none
+#main-app {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+#chat-log {
+    list-style: inside;
+    flex: 1;
+    overflow-y: scroll;
+    padding-left: 0;
+}
+
+#chat-log > li {
+    display: block;
+}
+
+#chat-submit {
+    margin-bottom: 2em;
 }
