@@ -19,9 +19,14 @@ document.getElementById("chat-submit").addEventListener("submit", function(e) {
                 var data = JSON.parse(e.data);
                 var msg = data.message;
                 console.log("Received message from server:", data);
+                var atBottom = chatlog.scrollTop == chatlog.scrollTopMax;
                 var child = document.createElement("li");
                 child.textContent = msg;
                 chatlog.appendChild(child);
+
+                if (atBottom) {
+                    chatlog.scrollTop = chatlog.scrollHeight;
+                }
             };
             ws.onclose = function() {
                 ws = null;
