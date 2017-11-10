@@ -45,7 +45,7 @@ class HomeController @Inject()(cc: ControllerComponents)(
 
   def chat() = WebSocket.accept[actors.ClientCommand, actors.ClientOutput] { request =>
     ActorFlow.actorRef { out =>
-      PropsAdapter(actors.ChatRoom.unconnectedClient(roomActor, out))
+      PropsAdapter(actors.Client.behavior(roomActor, out))
     }
   }
 }
