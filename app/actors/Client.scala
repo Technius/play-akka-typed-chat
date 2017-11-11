@@ -41,8 +41,13 @@ object Client {
     Actor.immutable[ChatEvent] { (_, msg) =>
       msg match {
         case DisplayMessage(msg) => output ! Message(msg)
-        case Connected(room) =>
+        case Connected(room, onlineUsers) =>
           output ! Message("Connected to room")
+          if (onlineUsers.isEmpty) {
+            output ! Message("You are currently the only user online.")
+          } else {
+            output ! Message("Currently online: " + onlineUsers.mkString(", "))
+          }
           inputHandler ! SwitchToConnected(room)
         case _ =>
       }

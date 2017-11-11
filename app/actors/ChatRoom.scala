@@ -16,7 +16,7 @@ object ChatRoom {
           }
           Actor.same
         case JoinRoom(newUser, name) =>
-          newUser ! Connected(ctx.self)
+          newUser ! Connected(ctx.self, sessions.values.toSeq)
           val newSessions = sessions + ((newUser, name))
           ctx.watch(newUser)
           newSessions.foreach(_._1 ! DisplayMessage(s"[System] $name has connected."))
@@ -44,7 +44,7 @@ sealed trait ClientOutput
 final case class Message(message: String) extends ClientOutput
 
 sealed trait ChatEvent
-final case class Connected(room: ActorRef[RoomCommand]) extends ChatEvent
+final case class Connected(room: ActorRef[RoomCommand], onlineUsers: Seq[String]) extends ChatEvent
 final case class DisplayMessage(message: String) extends ChatEvent
 
 sealed trait Command
