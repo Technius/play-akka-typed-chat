@@ -18,6 +18,8 @@ object Client {
         case Connect(name) =>
           connector ! JoinRoom(outHandler, name)
           Actor.same
+        case ForceDisconnect =>
+          Actor.stopped
         case SwitchToConnected(handle) => connectedBehavior(handle, outHandler)
         case _ => Actor.same
       }
@@ -49,6 +51,9 @@ object Client {
             output ! Message("Currently online: " + onlineUsers.mkString(", "))
           }
           inputHandler ! SwitchToConnected(room)
+        case LoginDenied(reason) =>
+          output ! Disconnected(s"Unable to log in (reason: $reason)")
+          inputHandler ! ForceDisconnect
         case _ =>
       }
       Actor.same
