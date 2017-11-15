@@ -4,13 +4,17 @@ import akka.typed._
 import akka.typed.scaladsl.Actor
 
 object ChatRoom {
-  def chatRoom(sessions: Map[ActorRef[ChatEvent], String]): Behavior[RoomCommand] = {
-    def nameOf(target: ActorRef[ChatEvent]): Option[String] =
-      sessions.collectFirst { case (r, n) if target == r => n }
+  type SessionMap = Map[ActorRef[ChatEvent], String]
 
-    def actorWithName(name: String): Option[ActorRef[ChatEvent]] =
-      sessions.collectFirst { case (r, n) if n == name => r }
+  private def nameOf(target: ActorRef[ChatEvent])(sessions: SessionMap): Option[String] =
+    sessions.collectFirst { case (r, n) if target == r => n }
 
+  private def actorWithName(name: String)(sessions: SessionMap): Option[ActorRef[ChatEvent]] =
+    sessions.collectFirst { case (r, n) if n == name => r }
+
+  def behavior: Behavior[RoomCommand] = chatRoom(Map.empty)
+
+  private def chatRoom(sessions: SessionMap): Behavior[RoomCommand] =
     Actor.immutable[RoomCommand] { (ctx, msg) =>
       msg match {
         case PostMessage(ref, msg) =>
@@ -18,7 +22,7 @@ object ChatRoom {
             sessions.foreach(_._1 ! DisplayMessage(s"$name: $msg"))
           }
           Actor.same
-        case JoinRoom(newUser, name) if actorWithName(name).isEmpty =>
+        case JoinRoom(newUser, name) if actorWithName(name)(sessions).isEmpty =>
           newUser ! Connected(ctx.self, sessions.values.toSeq)
           val newSessions = sessions + ((newUser, name))
           ctx.watch(newUser)
@@ -38,12 +42,6 @@ object ChatRoom {
         }
         chatRoom(newSessions)
     }
-  }
-
-  def echo(out: ActorRef[String]): Behavior[String] = Actor.immutable { (ctx, msg) =>
-    out ! msg
-    Actor.same
-  }
 }
 
 sealed trait ClientOutput

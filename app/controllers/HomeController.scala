@@ -32,7 +32,7 @@ class HomeController @Inject()(cc: ControllerComponents)(
     Ok(views.html.index())
   }
 
-  val roomActor = actorSystem.spawn(actors.ChatRoom.chatRoom(Map.empty), "room")
+  val roomActor = actorSystem.spawn(actors.ChatRoom.behavior, "room")
 
   implicit val clientCommandFormat: OFormat[actors.ClientCommand] =
     derived.oformat()
