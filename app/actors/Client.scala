@@ -4,12 +4,25 @@ import akka.typed._
 import akka.typed.scaladsl.Actor
 
 object Client {
+
+  /**
+    * The default behavior of a client actor. This actor handles all Command
+    * messages, since its state is dependent on both the messages from the
+    * client and the messages from the chat room.
+    *
+    * @param connector An actor that attempts to connect the client to the
+    * chat room when it receives a JoinRoom message.
+    * @param out The actor that writes received messages to the websocket.
+    */
   def behavior(connector: ActorRef[JoinRoom], out: ActorRef[ClientOutput]): Behavior[Command] =
     Actor.deferred { ctx =>
       val outHandler = ctx.spawnAnonymous(outputHandler(ctx.self, out))
       unconnectedBehavior(connector, outHandler)
     }
 
+  /**
+    * The behavior of a client actor when it is not connected to any chat room.
+    */
   private def unconnectedBehavior(
       connector: ActorRef[JoinRoom],
       outHandler: ActorRef[ChatEvent]): Behavior[Command] =
@@ -25,6 +38,9 @@ object Client {
       }
     }
 
+  /**
+    * The behavior of a client actor when it connected to a chat room.
+    */
   private def connectedBehavior(
       room: ActorRef[RoomCommand],
       outputHandler: ActorRef[ChatEvent]): Behavior[Command] =
@@ -37,6 +53,9 @@ object Client {
       }
     }
 
+  /**
+    * An actor that handles messages from a chat room.
+    */
   private def outputHandler(
       inputHandler: ActorRef[InputHandlerCommand],
       output: ActorRef[ClientOutput]): Behavior[ChatEvent] =
